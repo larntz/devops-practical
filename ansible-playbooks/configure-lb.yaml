@@ -1,0 +1,56 @@
+---
+- name: configure haproxy loadbalancer
+  hosts: lb
+  become: true
+  tasks:
+    - name: get control plain ips
+      set_fact:
+        cp_ips: "{{ control_ips.split(',') }}"
+        lb_ip: "{{ ansible_host }}"
+
+    - name: install haproxy
+      apt:
+        name: haproxy
+        state: latest
+
+    - name: configure haproxy frontend and backend
+      blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        block: |
+
+          frontend kube-apiserver
+            bind *:6443
+            mode tcp
+            option tcplog
+            default_backend kube-apiserver
+           
+          backend kube-apiserver
+              mode tcp
+              option tcplog
+              option tcp-check
+              balance roundrobin
+              default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+
+          server cp-00 {{ cp_ips[0] }}:6443 check
+          server cp-01 {{ cp_ips[1] }}:6443 check
+          server cp-02 {{ cp_ips[2] }}:6443 check
+
+    - name: verify haproxy is enabled and reload
+      systemd:
+        name: haproxy
+        enabled: true
+        state: reloaded 
+
+    - name: add loadbalancer global vars for kubespray
+      become: false
+      delegate_to: localhost
+      blockinfile:
+        marker: "# {mark} lb config {{ lb_ip }}" 
+        create: true
+        mode: "0644"
+        path: ./kubespray-global-vars.yaml
+        block: |
+          apiserver_loadbalancer_domain_name: "lb.local"
+          loadbalancer_apiserver:
+            address: {{ lb_ip }}
+            port: 6443

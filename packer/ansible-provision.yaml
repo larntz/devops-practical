@@ -1,0 +1,17 @@
+---
+- name: customize image
+  hosts: 127.0.0.1
+  become: true
+  connection: local
+  tasks:
+    - name: install ntp
+      apt:
+        state: latest
+        name:
+          - ntp
+    - name: enable and start ntp
+      systemd:
+        name: ntp
+        enabled: yes
+        state: started
+

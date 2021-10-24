@@ -1,0 +1,7 @@
+venv/
+ansible-playbooks/kubespray/
+packer-builds/
+devops-practical/repo/
+.terraform/
+
+*.tfstate*

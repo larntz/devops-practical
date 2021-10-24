@@ -1,0 +1,11 @@
+---
+- name: configure cluster
+  hosts: all
+  become: true
+  tasks:
+- name: individual node configuration 
+  import_playbook: ./configure-node.yaml
+- name: configure haproxy loadbalancer
+  import_playbook: ./configure-lb.yaml
+- name: configure kubespray globals
+  import_playbook: ./configure-kubespray.yaml

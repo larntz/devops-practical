@@ -1,0 +1,35 @@
+[all]
+%{ for index, group in ansible_group_control ~}
+${ ansible_group_control[index]} ansible_host=${ ansible_control_ips[index] }
+%{ endfor ~}
+%{ for index, group in ansible_group_workload ~}
+${ ansible_group_workload[index]} ansible_host=${ ansible_workload_ips[index] }
+%{ endfor ~}
+lb-00 ansible_host=${ ansible_lb_ip } control_ips=${ join(",",ansible_control_ips) }
+
+[all:vars]
+ansible_user=debian
+ansible_ssh_common_args="-o UserKnownHostsFile=.known_hosts -o StrictHostKeyChecking=accept-new"
+
+
+[lb]
+lb-00
+
+[kube_control_plane]
+%{ for index, group in ansible_group_control ~}
+${ ansible_group_control[index]}
+%{ endfor ~}
+
+[etcd]
+%{ for index, group in ansible_group_control ~}
+${ ansible_group_control[index]}
+%{ endfor ~}
+
+[kube_node]
+%{ for index, group in ansible_group_workload ~}
+${ ansible_group_workload[index]}
+%{ endfor ~}
+
+[k8s_cluster:children]
+kube_node
+kube_control_plane
