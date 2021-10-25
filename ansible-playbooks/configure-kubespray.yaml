@@ -11,28 +11,11 @@
         mode: "0644"
         path: kubespray-global-vars.yaml
         block: |
-          ingress_nginx_enabled: true
+          # enable metallb
           kube_proxy_strict_arp: true
           metallb_enabled: true
           metallb_speaker_enabled: true
           metallb_ip_range:
             - 192.168.200.253-192.168.200.254
-    - name: add metallb global vars for kubespray
-      become: false
-      delegate_to: localhost
-      blockinfile:
-        marker: "# {mark} ingress-nginx config" 
-        mode: "0644"
-        path: kubespray-global-vars.yaml
-        block: |
-          ingress_nginx_enabled: true
-
-    - name: add metallb global vars for kubespray
-      become: false
-      delegate_to: localhost
-      blockinfile:
-        marker: "# {mark} ingress-nginx config" 
-        mode: "0644"
-        path: kubespray-global-vars.yaml
-        block: |
+          # export kubeconfig after cluster creation
           kubeconfig_localhost: true
