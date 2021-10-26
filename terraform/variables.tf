@@ -3,13 +3,11 @@ variable "libvirt_url" {
   default = "qemu:///system"
 }
 
-variable "control_nodes" {
-  type = number
-  default = 3
-}
-
 variable "worker_nodes" {
   type = number
   default = 2
+  validation {
+    condition = var.worker_nodes >= 2 && var.worker_nodes <= 7
+    error_message = "Variable worker_nodes must be 2 <= and >= 7."
+  }
 }
-

@@ -7,8 +7,9 @@ terraform -chdir=./terraform/ apply -auto-approve
 # run asible playbook to configure cluster lb and kubespray global vars
 ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
 
+# this is removed. kubespray is now part of the configure-cluster playbook.
 # run kubespray
-ansible-playbook -i cluster-hosts -e @ansible-playbooks/kubespray-global-vars.yaml ansible-playbooks/kubespray/cluster.yml --become
+# ansible-playbook -i cluster-hosts -e @ansible-playbooks/kubespray-global-vars.yaml ansible-playbooks/kubespray/cluster.yml --become
 
 echo "finished."
 echo "export KUBECONFIG=$PWD/artifacts/admin.conf to access cluster"

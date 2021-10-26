@@ -1,0 +1,1 @@
+git+https://salsa.debian.org/apt-team/python-apt

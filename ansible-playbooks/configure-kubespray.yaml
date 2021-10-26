@@ -1,7 +1,7 @@
 ---
 - name: configure kubespray global vars
   hosts: localhost
-  become: true
+  become: false
   tasks:
     - name: add metallb global vars for kubespray
       become: false
@@ -20,5 +20,5 @@
           metallb_ip_range:
             - 192.168.200.253-192.168.200.254
           # export kubeconfig after cluster creation
-          artifacts_dir: ./kubespray_artifacts
           kubeconfig_localhost: true
+          artifacts_dir: ./kubeconfig

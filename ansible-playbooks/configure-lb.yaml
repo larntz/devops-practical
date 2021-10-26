@@ -8,6 +8,10 @@
         cp_ips: "{{ control_ips.split(',') }}"
         lb_ip: "{{ ansible_host }}"
 
+    - name: set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
     - name: install haproxy
       apt:
         name: haproxy

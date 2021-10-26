@@ -46,7 +46,7 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "./ansible-provision.yaml"
+      "playbook_file": "packer/ansible-provision.yaml"
     }
   ],
   "variables": {

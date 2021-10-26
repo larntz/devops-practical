@@ -3,23 +3,26 @@
   hosts: all
   become: true
   tasks:
-- name: individual node configuration 
-  import_playbook: ./configure-node.yaml
+
 - name: configure haproxy loadbalancer
   import_playbook: ./configure-lb.yaml
 - name: configure kubespray globals
   import_playbook: ./configure-kubespray.yaml
 
-- name: install kubespray
+- name: run kubespray
   hosts: all
-  become: true
   tasks:
     # load kubespray global vars
     - name: Load kubespray variables
       include_vars: ./kubespray-global-vars.yaml
 - name: run kubespray playbook
+  tags:
+    - run_kubespray
   import_playbook: ./kubespray/cluster.yml
-
+  vars:
+    ansible_become: true
 
 - name: post kubespray configuration
+  tags:
+    - post_kubespray_config
   import_playbook: ./post-kubespray-configuration.yaml

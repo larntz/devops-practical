@@ -1,0 +1,33 @@
+[all]
+cp-00 ansible_host=192.168.200.48
+cp-01 ansible_host=192.168.200.201
+cp-02 ansible_host=192.168.200.183
+wk-00 ansible_host=192.168.200.138
+wk-01 ansible_host=192.168.200.9
+lb-00 ansible_host=192.168.200.16 control_ips=192.168.200.48,192.168.200.201,192.168.200.183
+
+[all:vars]
+ansible_user=debian
+ansible_ssh_common_args="-o UserKnownHostsFile=.known_hosts -o StrictHostKeyChecking=accept-new"
+
+
+[lb]
+lb-00
+
+[kube_control_plane]
+cp-00
+cp-01
+cp-02
+
+[etcd]
+cp-00
+cp-01
+cp-02
+
+[kube_node]
+wk-00
+wk-01
+
+[k8s_cluster:children]
+kube_node
+kube_control_plane

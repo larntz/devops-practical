@@ -21,6 +21,14 @@ resource "libvirt_network" "k8snet" {
   }
 }
 
+resource "random_string" "deployment_id" {
+  length = 6
+  special = false
+  lower = true
+  upper = false
+  number = false
+}
+
 resource "libvirt_volume" "os_image" {
   name = "debian-bullseye.qcow2"
   #source = "https://cloud.debian.org/images/cloud/bullseye/20211011-792/debian-11-generic-amd64-20211011-792.qcow2"
@@ -28,19 +36,19 @@ resource "libvirt_volume" "os_image" {
 }
 
 resource "libvirt_volume" "lb-volume" {
-  name  = "lb-vol-00.qcow2"
+  name  = "lb-${ random_string.deployment_id.result }}-vol-00.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "cp-volume" {
-  count = var.control_nodes
-  name  = "cp-vol-0${count.index}.qcow2"
+  count = 3
+  name  = "cp-${ random_string.deployment_id.result }}-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "wk-volume" {
   count = var.worker_nodes
-  name  = "wk-vol-0${count.index}.qcow2"
+  name  = "wk-${ random_string.deployment_id.result }}-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
@@ -56,7 +64,7 @@ data "template_file" "user_data" {
 resource "libvirt_domain" "lb-domain" {
   vcpu = 2
   memory = "4096"
-  name = "lb-00"
+  name = "lb-${ random_string.deployment_id.result }}-00"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -74,10 +82,10 @@ resource "libvirt_domain" "lb-domain" {
 }
 
 resource "libvirt_domain" "cp-domain" {
-  count = var.control_nodes
+  count = 3
   vcpu = 4
   memory = "8192"
-  name = "cp-0${count.index}"
+  name = "cp-${ random_string.deployment_id.result }}-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -98,7 +106,7 @@ resource "libvirt_domain" "wk-domain" {
   count = var.worker_nodes
   vcpu = 4 
   memory = "16384"
-  name = "wk-0${count.index}"
+  name = "wk-${ random_string.deployment_id.result }}-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {

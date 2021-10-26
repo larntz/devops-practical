@@ -1,11 +1,11 @@
 ---
 - name: perform post kubespray cluster configuration
   hosts: localhost
-  become: false
+  become: true
   tasks:
     - name: set kubeconfig fact
       set_fact:
-        kubeconfig: "../artifacts/admin.conf"
+        kubeconfig: "kubespray/kubeconfig/admin.conf"
 
     # cert-manager
     - name: add jetstack cert-manager repo
