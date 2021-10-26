@@ -42,6 +42,7 @@ This solution will build an HA k8s cluster on libvirt/qemu using the following t
   - packer
   - terraform
   - ansible
+  - helm (called from ansible)
 
 We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-7 worker nodes. 
 
@@ -75,7 +76,7 @@ NOTE: the remaining commands in this README should be exected from the repo's to
     ```
     python3 -m venv ./venv
     # NOTE: you may need to source a different `activate` file if your shell isn't bash.
-    source ./venv/bin/activate` 
+    source ./venv/bin/activate 
     ```
 1. Install required python packages with pip.
     ```
@@ -104,17 +105,31 @@ NOTE: the remaining commands in this README should be exected from the repo's to
 
 ### build steps
 
-Once the prerequisites are met the entire system can be built using the three commands below. 
+Once the prerequisites are met the entire system can be built using the commands below. 
 
 1. create the vm image with packer.
-  - `packer build packer/debian.json`
+    ```
+    packer build packer/debian.json
+    ```
 1. deploy vm infrastructure using terraform
-  - `terraform -chdir=terraform/ apply -auto-approve`
+    ```
+    terraform -chdir=terraform/ init
+    terraform -chdir=terraform/ apply -auto-approve
+    ```
 1. use ansible to configure loadblancer, kubespray vars, and install cert-manager, ingress-nginx, mongodb, and our devops-practical swimapp. 
-  - `ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml`
+    ```
+    ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
+    ```
 
 ### access cluster and validation
 
+After the cluster has been deployed and configured the admin kubeconfig file will be located in `ansible-playbooks/kubespray/kubeconfig/admin.conf`. 
+
+
+
+---
+
+---
 
 ---
 
