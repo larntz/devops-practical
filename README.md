@@ -30,6 +30,41 @@ If you don't make it through everything here we'd still like to see the progress
 
 # Solution
 
+## overview
+
+This solution will build an HA k8s cluster on libvirt/qemu using the following tools:
+
+  - packer
+  - terraform
+  - ansible
+
+We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-7 worker nodes. 
+
+### prebuild steps
+
+1. Clone this code repository.
+  - `https://github.com/larntz/devops-practical.git devops-practical`
+1. Move into the `devops-practical` directory.
+  - `cd devops-practical`
+1. Clone the kubespray repository into the `ansible-playbooks` directory.
+  - `https://github.com/kubernetes-sigs/kubespray.git ansible-playbooks/kubespray`
+1. Create a python3 venv and activate it. 
+  - `python3 -m venv ./venv`
+  - `source ./venv/bin/activate` __NOTE:__ you may need to source a different `activate` file if your shell isn't bash. 
+1. Install required python packages with pip.
+
+### build steps
+
+__NOTE:__ All commands should be run from the repo top level directory.
+
+1. create the vm image with packer.
+  - `packer build packer/debian.json`
+1. deploy vm infrastructure using terraform
+  - `terraform -chdir=terraform/ apply -auto-approve`
+1. use ansible to configure loadblancer, kubespray vars, and install cert-manager, ingress-nginx, mongodb, and our devops-practical swimapp. 
+  - `ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml`
+
+
 ## solution host system requirements
 
 need to have:
@@ -72,9 +107,8 @@ packer build debian.json
 
 terraform will build VMs running on libvirt.
 
-The variables.tf file declares 3 variables:
+The variables.tf file declares 2 variables:
  - `libvirt_url` specifies which libvirt host to use. Defaults to `qemu:///system`.
- - `control_nodes` specifies the number of control node vms to deploy. Defaults to 3. 
  - `worker_nodes` specifies how many worker nodes to deploy. Defaults to 2.
 
 terraform will deploy one additional vm, lb-00.  This vm will run haproxy to loadbalancer the k8s apiserver. 
