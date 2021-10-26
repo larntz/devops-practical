@@ -49,9 +49,9 @@ We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-
 
 __NOTE:__ This was developed and tested on Debian 10. Other distros may have different requirements. Setting up libvirt, qemu, and user permissions is outside the scope of this document. Information to get started setting up KVM on Debian can be found [here](https://wiki.debian.org/KVM)
 
-1. Install debian packages on host system. The build-essentials package is arequired to build python-apt which is used by ansible. 
+1. Install debian packages on host system.
     ```
-    sudo apt install -y python3 python3-venv build-essentials software-properties-common mkisofs \
+    sudo apt install -y python3 python3-venv build-essential software-properties-common mkisofs \
       apt-transport-https ca-certificates curl
     ```
 1. Clone this code repository.
