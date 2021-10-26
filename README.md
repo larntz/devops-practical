@@ -41,7 +41,7 @@ need to have:
 
 ### bootstrap environment
 
-1. git clone (this repo)
+1. git clone https://github.com/larntz/devops-practical.git && cd devops-practical
 1. git clone https://github.com/kubernetes-sigs/kubespray.git ./ansible-playbooks/kubespray
 1. mkdir venv && python3 -m venv ./venv/ && source ./venv/bin/activate{.fish for me}
 1. pip install -r kubespray/requirements.txt
@@ -133,6 +133,16 @@ echo "export KUBECONFIG=$PWD/artifacts/admin.conf to access cluster"
 ### application deployment
 
 There are two helm charts in this repo. One is `./helm-charts/mongo-chart.tgz` and the other is `./helm-charts/swim-chart.tgz`. 
+
+#### dockerization
+
+The swimapp Dockerfile is located at `./docker/Dockerfile.swimapp`.
+
+
+```
+docker build -t larntz/swim:2021102401 -f Dockerfile.swimapp .
+```
+
 
 #### mongodb deployment
 

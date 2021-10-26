@@ -1,3 +1,4 @@
+# vim:filetype=dockerfile
 FROM node:17
 
 RUN useradd -m app

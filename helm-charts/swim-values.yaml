@@ -1,7 +1,7 @@
 app:
   replicas: 3
   name: swim-app
-  label: swimapp
+  label: swim-app
   image:
     repository: larntz/swim
     tag: "2021102401"
