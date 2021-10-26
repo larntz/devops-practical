@@ -42,21 +42,41 @@ We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-
 
 ### prebuild steps
 
+__NOTE:__ This was developed and tested on Debian 10. Other distros may have different requirements. 
+
+1. Install debian packages on host system. The build-essentials package is arequired to build python-apt which is used by ansible. 
+    ```
+    apt install -y python3 python3-venv build-essentials 
+    ```
 1. Clone this code repository.
     ```
     git clone https://github.com/larntz/devops-practical.git devops-practical
     ```
+
+__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory.
+
 1. Clone the kubespray repository into the `ansible-playbooks` directory.
     ```
     git clone https://github.com/kubernetes-sigs/kubespray.git devops-practical/ansible-playbooks/kubespray
     ```
 1. Move into the `devops-practical` directory.
-  - `cd devops-practical`
+    ```
+    cd devops-practical
+    ```
 1. Create a python3 venv and activate it. 
-  - `python3 -m venv ./venv`
-  - `source ./venv/bin/activate` __NOTE:__ you may need to source a different `activate` file if your shell isn't bash. 
+    ```
+    python3 -m venv ./venv
+    source ./venv/bin/activate` __NOTE:__ you may need to source a different `activate` file if your shell isn't bash.
+    ```
 1. Install required python packages with pip.
-
+    ```
+    pip install -r ansible-playbooks/requirements/requirements.txt -r ansible-playbooks/kubespray/requirements.txt
+    ```
+1. Install required ansible-galaxy collections.
+    ```
+    ansible-galaxy install -r ansible-playbooks/requirements/requirements.yaml
+    ```
+    
 ### build steps
 
 __NOTE:__ All commands should be run from the repo top level directory.
@@ -73,7 +93,7 @@ __NOTE:__ All commands should be run from the repo top level directory.
 
 need to have:
   - qemu/libvirt on localhost with correct permissions for user
-  - python3 and python3-venv 
+  - apt install -y python3 python3-venv build-essentials #build-essentials requried for building python-apt
   - terraform 
   - packer 
   - helm (helm diff plugin optional)
