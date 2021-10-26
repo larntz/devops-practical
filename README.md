@@ -47,7 +47,9 @@ We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-
 
 ### prebuild steps
 
-__NOTE:__ This was developed and tested on Debian 10. Other distros may have different requirements. Setting up libvirt, qemu, and user permissions is outside the scope of this document. Information to get started setting up KVM on Debian can be found [here](https://wiki.debian.org/KVM)
+This was developed and tested on Debian 10. Other distros may have different requirements. Setting up libvirt, qemu, and user permissions is outside the scope of this document. Information to get started setting up KVM on Debian can be found [here](https://wiki.debian.org/KVM)
+
+These commands should be run from a user that can sudo without a password.
 
 1. Install debian packages on host system.
     ```
@@ -63,7 +65,7 @@ __NOTE:__ This was developed and tested on Debian 10. Other distros may have dif
     cd devops-practical
     ```
 
-__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory._
+NOTE: the remaining commands in this README should be exected from the repo's top level directory.
 
 4. Clone the kubespray repository into the `ansible-playbooks` directory.
     ```
@@ -72,7 +74,8 @@ __NOTE:__ _the remaining commands in this README should be exected from the repo
 1. Create a python3 venv and activate it. 
     ```
     python3 -m venv ./venv
-    source ./venv/bin/activate` __NOTE:__ you may need to source a different `activate` file if your shell isn't bash.
+    # NOTE: you may need to source a different `activate` file if your shell isn't bash.
+    source ./venv/bin/activate` 
     ```
 1. Install required python packages with pip.
     ```
@@ -100,8 +103,6 @@ __NOTE:__ _the remaining commands in this README should be exected from the repo
     ```
 
 ### build steps
-
-__NOTE:__ All commands should be run from the repo top level directory.
 
 Once the prerequisites are met the entire system can be built using the three commands below. 
 
