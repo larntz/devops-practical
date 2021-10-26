@@ -43,11 +43,15 @@ We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-
 ### prebuild steps
 
 1. Clone this code repository.
-  - `https://github.com/larntz/devops-practical.git devops-practical`
+    ```
+    git clone https://github.com/larntz/devops-practical.git devops-practical
+    ```
+1. Clone the kubespray repository into the `ansible-playbooks` directory.
+    ```
+    git clone https://github.com/kubernetes-sigs/kubespray.git devops-practical/ansible-playbooks/kubespray
+    ```
 1. Move into the `devops-practical` directory.
   - `cd devops-practical`
-1. Clone the kubespray repository into the `ansible-playbooks` directory.
-  - `https://github.com/kubernetes-sigs/kubespray.git ansible-playbooks/kubespray`
 1. Create a python3 venv and activate it. 
   - `python3 -m venv ./venv`
   - `source ./venv/bin/activate` __NOTE:__ you may need to source a different `activate` file if your shell isn't bash. 
