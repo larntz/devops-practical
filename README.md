@@ -1,6 +1,6 @@
 # Contents
 
-  - [Objective](#infrastructure-practical)
+  - [Objective](#objective)
   - [Solution](#solution)
 
 # Objective
