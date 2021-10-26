@@ -53,7 +53,7 @@ __NOTE:__ This was developed and tested on Debian 10. Other distros may have dif
     git clone https://github.com/larntz/devops-practical.git devops-practical
     ```
 
-__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory.
+__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory._
 
 3. Clone the kubespray repository into the `ansible-playbooks` directory.
     ```
