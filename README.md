@@ -55,7 +55,7 @@ __NOTE:__ This was developed and tested on Debian 10. Other distros may have dif
 
 __NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory.
 
-1. Clone the kubespray repository into the `ansible-playbooks` directory.
+3. Clone the kubespray repository into the `ansible-playbooks` directory.
     ```
     git clone https://github.com/kubernetes-sigs/kubespray.git devops-practical/ansible-playbooks/kubespray
     ```
