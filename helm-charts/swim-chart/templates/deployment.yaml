@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "swim-chart.fullname" . }}-swim-app
+  labels:
+    app: {{ .Values.app.label }}
+  {{- include "swim-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.label }} 
+    {{- include "swim-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.label }} 
+      {{- include "swim-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_URL
+          value: mongodb+srv://{{ .Values.mongodb.username }}:{{ .Values.mongodb.password }}@{{ .Values.mongodb.svcName }}.{{ .Values.mongodb.namespace }}.svc.cluster.local/{{ .Values.mongodb.database }}?authSource=admin&ssl=false
+        image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag
+          | default .Chart.AppVersion }}
+        name: {{ .Values.app.name }}
+        ports:
+        - containerPort: 3000
+        resources: {{- toYaml .Values.app.resources | nindent 10 }}

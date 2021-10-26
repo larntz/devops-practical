@@ -1,0 +1,71 @@
+---
+- name: perform post kubespray cluster configuration
+  hosts: localhost
+  become: false
+  tasks:
+    - name: set kubeconfig fact
+      set_fact:
+        kubeconfig: "../artifacts/admin.conf"
+
+    # cert-manager
+    - name: add jetstack cert-manager repo
+      community.kubernetes.helm_repository:
+        name: jetstack
+        repo_url: https://charts.jetstack.io
+    - name: helm install cert-manager
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig }}"
+        name: cert-manager
+        release_namespace: cert-manager
+        create_namespace: true
+        chart_ref: jetstack/cert-manager
+        chart_version: v1.5.4
+        values:
+          installCRDs: true
+    - name: configure self-signed cluster issuer
+      community.kubernetes.k8s:
+        state: present
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: ClusterIssuer
+          metadata:
+            name: selfsigned-cluster-issuer
+          spec:
+            selfSigned: {}
+
+    # ingress-nginx
+    - name: add ingress-nginx repo
+      community.kubernetes.helm_repository: 
+        name: ingress-nginx
+        repo_url: https://kubernetes.github.io/ingress-nginx
+    - name: helm install ingress-nginx
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig }}"
+        name: ingress-nginx
+        release_namespace: ingress-nginx
+        create_namespace: true
+        chart_ref: ingress-nginx/ingress-nginx
+        chart_version: 4.0.6
+
+    # mongo-chart
+    - name: helm install mongo-chart
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig }}"
+        name: mongodb
+        release_namespace: mongodb
+        create_namespace: true
+        chart_ref: ../helm-charts/mongo-chart.tgz
+        values_files: ../helm-charts/mongo-values.yaml
+
+    - name: wait for mongodb to deploy cluster
+      pause:
+        minutes: 2
+
+    - name: helm install swimapp
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig }}"
+        name: swimapp
+        release_namespace: swimapp
+        create_namespace: true
+        chart_ref: ../helm-charts/swim-chart.tgz
+        values_files: ../helm-charts/swim-values.yaml

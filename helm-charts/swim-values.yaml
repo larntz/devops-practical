@@ -1,20 +1,10 @@
 app:
   replicas: 3
-  name: swim-app
-  label: swim-app
-  image:
-    repository: larntz/swim
-    tag: "2021102401"
-  resources:
-    limits:
-      cpu: 1
-      memory: 512Mi
-    requests:
-      cpu: 500m
-      memory: 256Mi
-  mongodb:
-    # information required to construct the MONGODB_URL
-    username: swim
-    password: intheocean
-    svcName: mongodb-mongo-chart-svc
-    namespace: mongodb
+  hostname: swim.app
+mongodb:
+  # information required to construct the MONGODB_URL
+  database: swimdb
+  username: swim
+  password: intheocean
+  svcName: mongodb-mongo-chart-svc
+  namespace: mongodb

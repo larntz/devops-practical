@@ -9,3 +9,17 @@
   import_playbook: ./configure-lb.yaml
 - name: configure kubespray globals
   import_playbook: ./configure-kubespray.yaml
+
+- name: install kubespray
+  hosts: all
+  become: true
+  tasks:
+    # load kubespray global vars
+    - name: Load kubespray variables
+      include_vars: ./kubespray-global-vars.yaml
+- name: run kubespray playbook
+  import_playbook: ./kubespray/cluster.yml
+
+
+- name: post kubespray configuration
+  import_playbook: ./post-kubespray-configuration.yaml

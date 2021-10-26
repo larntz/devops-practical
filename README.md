@@ -37,6 +37,8 @@ need to have:
   - python3 and python3-venv 
   - terraform 
   - packer 
+  - helm (helm diff plugin optional)
+  - kubectl 
   - mkisofs for create cloudinit iso (terraform)
 
 ### bootstrap environment
@@ -46,6 +48,7 @@ need to have:
 1. mkdir venv && python3 -m venv ./venv/ && source ./venv/bin/activate{.fish for me}
 1. pip install -r kubespray/requirements.txt
 1. pip install git+https://salsa.debian.org/apt-team/python-apt (running required for running ansible apt module)
+1. pip install openshift (for interation with kubernetes)
 
 ## solution deployment
 
@@ -54,6 +57,8 @@ need to have:
 #### packer build
 
 Packer will build a debian 11 images and save it to `../packer-builds/packer-debian-11.1-amd64-qemu/debian-11.1-amd64`. This images will be used by terraform in the next step. 
+
+Packer also runs an ansible-playbook against the host to ensure all packages are updated to the latest version, and that the ntp service is enabled and started. 
 
 From the packer/ directory run: 
 
@@ -130,9 +135,49 @@ echo "finished..."
 echo "export KUBECONFIG=$PWD/artifacts/admin.conf to access cluster"
 ```
 
+### ingress-nginx and cert-manager deployment with helm
+
+#### install ingress-nginx and cert-manager helm repos
+
+```
+helm repo add jetstack https://charts.jetstack.io
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+```
+
+#### ingress-nginx
+
+ingress-nginx can be installed with the default values. 
+
+```
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+```
+
+#### cert-manager
+
+cert-manager needs installed with `--set installCRDs=true` to install necessary CRDs with helm.
+
+```
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace --version v1.5.4 --set installCRDs=true
+```
+
+cert-manger also needs configured with a cluster-issuer. For this use case I create a self-signed issuer. 
+
+```
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-cluster-issuer
+spec:
+  selfSigned: {}
+```
+
 ### application deployment
 
 There are two helm charts in this repo. One is `./helm-charts/mongo-chart.tgz` and the other is `./helm-charts/swim-chart.tgz`. 
+
+The mongo-community-operator doesn't have a supported helm chart so I created one using the resources required. 
 
 #### dockerization
 
@@ -158,7 +203,7 @@ mongodb:
   database:  # the user will only be granted access to this database.
 ```
 
-Edit the `mongo-values.yaml` file and then install the chart with this command:
+Edit the `mongo-values.yaml` file and then install the chart with this command from within the helm-charts directory:
 
 ```
 helm install mongodb ./mongo-chart.tgz --namespace mongodb -f mongo-values.yaml
@@ -166,4 +211,38 @@ helm install mongodb ./mongo-chart.tgz --namespace mongodb -f mongo-values.yaml
 
 #### swim app deployment
 
+The swim-chart will install the devops-practical application. 
 
+The default values:
+
+```
+app:
+  replicas: 3
+  name: swim-app
+  label: swim-app
+  image:
+    repository: larntz/swim
+    tag: "2021102401"
+  resources:
+    limits:
+      cpu: 1
+      memory: 512Mi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+  mongodb:
+    # information required to construct the MONGODB_URL
+    # these values should match the values used in the mongo-chart deployment.
+    database:     # database name 
+    username:     # username used to connect to the database 
+    password:     # password used to connect ot the database
+    svcName:      # this is required for constructing the MONGODB_URL
+    namespace:    # this is required for constructing the MONGODB_URL
+```
+
+Helm chart install command (run from within the helm-charts directory): 
+
+
+```
+helm install swimapp ./swim-chart.tgz -n swimapp -f swim-values.yaml --create-namespace
+```
