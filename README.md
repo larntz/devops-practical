@@ -1,4 +1,9 @@
-# Infrastructure Practical
+# Contents
+
+  - [Objective](#infrastructure-practical)
+  - [Solution](#solution)
+
+# Objective
 
   - Dockerize https://github.com/swimlane/devops-practical
   - MongoDB should also be deployed as a docker container
@@ -42,26 +47,27 @@ We will build an haproxy loadbalancer, three contorl plane nodes, and between 2-
 
 ### prebuild steps
 
-__NOTE:__ This was developed and tested on Debian 10. Other distros may have different requirements. 
+__NOTE:__ This was developed and tested on Debian 10. Other distros may have different requirements. Setting up libvirt, qemu, and user permissions is outside the scope of this document. Information to get started setting up KVM on Debian can be found [here](https://wiki.debian.org/KVM)
 
 1. Install debian packages on host system. The build-essentials package is arequired to build python-apt which is used by ansible. 
     ```
-    apt install -y python3 python3-venv build-essentials 
+    sudo apt install -y python3 python3-venv build-essentials software-properties-common mkisofs \
+      apt-transport-https ca-certificates curl
     ```
 1. Clone this code repository.
     ```
     git clone https://github.com/larntz/devops-practical.git devops-practical
     ```
-
-__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory._
-
-3. Clone the kubespray repository into the `ansible-playbooks` directory.
-    ```
-    git clone https://github.com/kubernetes-sigs/kubespray.git devops-practical/ansible-playbooks/kubespray
-    ```
 1. Move into the `devops-practical` directory.
     ```
     cd devops-practical
+    ```
+
+__NOTE:__ _the remaining commands in this README should be exected from the repo's top level directory._
+
+4. Clone the kubespray repository into the `ansible-playbooks` directory.
+    ```
+    git clone https://github.com/kubernetes-sigs/kubespray.git ansible-playbooks/kubespray
     ```
 1. Create a python3 venv and activate it. 
     ```
@@ -76,10 +82,28 @@ __NOTE:__ _the remaining commands in this README should be exected from the repo
     ```
     ansible-galaxy install -r ansible-playbooks/requirements/requirements.yaml
     ```
-    
+1. Finally install `packer`, `terraform`, `helm`, and `kubectl`.
+    ```
+    # add hashicorp repositories
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+     
+    # add helm repositories
+    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+
+    # add kubernetes repo
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+    sudo apt update && sudo apt -y install packer terraform helm kubectl
+    ```
+
 ### build steps
 
 __NOTE:__ All commands should be run from the repo top level directory.
+
+Once the prerequisites are met the entire system can be built using the three commands below. 
 
 1. create the vm image with packer.
   - `packer build packer/debian.json`
@@ -88,6 +112,10 @@ __NOTE:__ All commands should be run from the repo top level directory.
 1. use ansible to configure loadblancer, kubespray vars, and install cert-manager, ingress-nginx, mongodb, and our devops-practical swimapp. 
   - `ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml`
 
+### access cluster and validation
+
+
+---
 
 ## solution host system requirements
 
