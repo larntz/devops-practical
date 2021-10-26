@@ -1,4 +1,4 @@
-## Infrastructure Practical
+# Infrastructure Practical
 
   - Dockerize https://github.com/swimlane/devops-practical
   - MongoDB should also be deployed as a docker container
@@ -26,31 +26,134 @@ To deliver your work, create a public Github repository with the following (at a
 
 If you don't make it through everything here we'd still like to see the progress you made and your thought process on the remaining work.
 
-## solution requirements
+--- 
+
+# Solution
+
+## solution host system requirements
 
 need to have:
   - qemu/libvirt on localhost with correct permissions for user
   - python3 and python3-venv 
   - terraform 
   - packer 
-  - mkisofs for cloudinit
+  - mkisofs for create cloudinit iso (terraform)
 
 ### bootstrap environment
 
-1. git clone https://github.com/kubernetes-sigs/kubespray.git
+1. git clone (this repo)
+1. git clone https://github.com/kubernetes-sigs/kubespray.git ./ansible-playbooks/kubespray
 1. mkdir venv && python3 -m venv ./venv/ && source ./venv/bin/activate{.fish for me}
 1. pip install -r kubespray/requirements.txt
-1. pip install git+https://salsa.debian.org/apt-team/python-apt (running from debian 10)
+1. pip install git+https://salsa.debian.org/apt-team/python-apt (running required for running ansible apt module)
+
+## solution deployment
+
+### vm image creation
+
+#### packer build
+
+Packer will build a debian 11 images and save it to `../packer-builds/packer-debian-11.1-amd64-qemu/debian-11.1-amd64`. This images will be used by terraform in the next step. 
+
+From the packer/ directory run: 
+
+```
+packer build debian.json
+```
+
+### cluster deployment steps
+
+#### terraform apply
+
+terraform will build VMs running on libvirt.
+
+The variables.tf file declares 3 variables:
+ - `libvirt_url` specifies which libvirt host to use. Defaults to `qemu:///system`.
+ - `control_nodes` specifies the number of control node vms to deploy. Defaults to 3. 
+ - `worker_nodes` specifies how many worker nodes to deploy. Defaults to 2.
+
+terraform will deploy one additional vm, lb-00.  This vm will run haproxy to loadbalancer the k8s apiserver. 
+
+At the end of the run terraform will output an ansible inventory file named `cluster-hosts`. This file will be in the top level repo directory, and will be used by ansible and kubespray to configure the cluster.
+
+cd into the terraform directory and run: 
+
+```
+terraform apply -auto-approve
+```
+
+#### ansible vm configuration
+
+Before running the kubespray playbook, we will run the `configure-cluster.yaml` playbook in the `ansible-playbooks` directory. This playbook will set the system host name, install, enable, and configure haproxy on the lb-00 vm. It also generates the kubespray global variable file.
+
+This command can be run from the repo's directory.
+
+```
+ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
+```
+
+#### ansible kubespray run
+
+kubespray's configuration file was crated in the prevous step. This config file contains lb-00's ip address, the metallb_ip_range and enables the local path provisioner (used by mongodb) and tells kubespray to save a copy of the cluster's kubeconfig locally.
+
+This command be run from the repo's directory.
+
+```
+ansible-playbook -i cluster-hosts -e @ansible-playbooks/kubespray-global-vars.yaml ansible-playbooks/kubespray/cluster.yml --become
+```
+
+#### script to run each step of the cluster build
+
+There is a simple script in the `scripts` directory that will run each step above sequentially. It's very crude at the moment and does not do any error handling.
+
+Before running this script you must build the vm image running the packer command listed above. The vm image must bit in the follow location `./packer-builds/packer-debian-11.1-amd64-qemu/debian-11.1-amd64`.
+
+```
+./scripts/create-cluster.sh
+```
+
+script contents:
+
+```
+#!/bin/bash
+
+# create vms and ansible host inventory
+terraform -chdir=./terraform/ apply -auto-approve
+
+# run asible playbook to configure cluster lb and kubespray global vars
+ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
+
+# run kubespray
+ansible-playbook -i cluster-hosts -e @ansible-playbooks/kubespray-global-vars.yaml ansible-playbooks/kubespray/cluster.yml --become
+
+echo "finished..."
+echo "export KUBECONFIG=$PWD/artifacts/admin.conf to access cluster"
+```
+
+### application deployment
+
+There are two helm charts in this repo. One is `./helm-charts/mongo-chart.tgz` and the other is `./helm-charts/swim-chart.tgz`. 
+
+#### mongodb deployment
+
+The mongo-chart will deploy the mongodb-community-operator and a 3 member cluster by default.
+
+The values file options for this chart are:
+
+```
+mongodb:
+  members: 3 # initial number of cluster members to deploy. Can be updated with `helm upgrade` to scale the cluster. 
+  username:  # user to create
+  password:  # new user's password
+  database:  # the user will only be granted access to this database.
+```
+
+Edit the `mongo-values.yaml` file and then install the chart with this command:
+
+```
+helm install mongodb ./mongo-chart.tgz --namespace mongodb -f mongo-values.yaml
+```
+
+#### swim app deployment
 
 
-## solution deploy
-
-1. ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ...
-
-
-
-
-## references
-
-- [packer flatcar example](https://github.com/flatcar-linux/flatcar-packer-qemu)
-- [python install on flatcar example](https://github.com/vmware/ansible-coreos-bootstrap)

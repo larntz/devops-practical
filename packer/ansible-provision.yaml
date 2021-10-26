@@ -4,6 +4,10 @@
   become: true
   connection: local
   tasks:
+    - name: Update all packages to their latest version
+      apt:
+        name: "*"
+        state: latest
     - name: install ntp
       apt:
         state: latest
@@ -14,4 +18,3 @@
         name: ntp
         enabled: yes
         state: started
-

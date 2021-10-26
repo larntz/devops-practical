@@ -11,6 +11,8 @@
         mode: "0644"
         path: kubespray-global-vars.yaml
         block: |
+          # enable local_path storage
+          local_path_provisioner_enabled: true
           # enable metallb
           kube_proxy_strict_arp: true
           metallb_enabled: true

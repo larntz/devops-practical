@@ -1,0 +1,11 @@
+FROM node:17
+
+RUN useradd -m app
+WORKDIR /home/app/swim
+RUN chown -R app.app /home/app/
+USER app
+RUN git clone https://github.com/swimlane/devops-practical.git ./ && \
+  git checkout 7f80c29b02eb9f6a168189f20bb66ad385c148dd  && \
+  npm install
+
+ENTRYPOINT ["npm","start"]

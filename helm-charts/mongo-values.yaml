@@ -1,0 +1,6 @@
+mongodb:
+  members: 3 
+  username: swim
+  password: intheocean
+  database: swimdb
+

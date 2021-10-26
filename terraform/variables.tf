@@ -1,6 +1,5 @@
 variable "libvirt_url" {
   type = string
-  #qemu+ssh://larntz@dell-r710/system?no_verify=1
   default = "qemu:///system"
 }
 
