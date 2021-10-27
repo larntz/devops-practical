@@ -248,5 +248,5 @@ NOTE: Nodes __must__ be removed in reverse order (highest nubmered nodes first).
 ### screenshots
 
 ![screenshot of new record](images/new-post.png)
-![screenshot of cluster resources](images/cluster-resources.png)
+![screenshot of cluster resources](images/cluster.png)
 
