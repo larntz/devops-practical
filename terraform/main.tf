@@ -85,7 +85,7 @@ resource "libvirt_domain" "cp-domain" {
   count = 3
   vcpu = 4
   memory = "8192"
-  name = "cp-${ random_string.deployment_id.result }-0${count.index}"
+  name = "${ random_string.deployment_id.result }-cp-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -106,7 +106,7 @@ resource "libvirt_domain" "wk-domain" {
   count = var.worker_nodes
   vcpu = 4 
   memory = "16384"
-  name = "wk-${ random_string.deployment_id.result }-0${count.index}"
+  name = "${ random_string.deployment_id.result }-wk-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
