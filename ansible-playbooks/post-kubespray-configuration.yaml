@@ -7,11 +7,11 @@
       ansible.builtin.file:
         state: directory
         path: "{{ playbook_dir }}/kubespray/kubeconfig"
-        mode: '0755'
+        mode: '0777'
     - name: set kubeconfig file permissions
       ansible.builtin.file:
         path: "{{ playbook_dir }}/kubespray/kubeconfig/admin.conf"
-        mode: '0644'
+        mode: '0666'
       register: admin_conf
     - name: debug
       debug:
