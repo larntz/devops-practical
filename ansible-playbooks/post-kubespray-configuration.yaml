@@ -79,7 +79,7 @@
 
     - name: wait for mongodb to deploy cluster
       pause:
-        minutes: 2
+        minutes: 5
 
     - name: helm install swimapp
       kubernetes.core.helm:

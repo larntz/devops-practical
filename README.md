@@ -1,3 +1,5 @@
+![screenshot of new record](images/new-article.png)
+
 # Contents
 
   - [Objective](#objective)
@@ -135,6 +137,6 @@ kubectl get nodes
 
 #### screenshots
 
-![screenshot of new record](images/new_record.png)
+![screenshot of new record](images/new-article.png)
 ![screenshot of cluster resources](images/cluster_resources.png)
 
