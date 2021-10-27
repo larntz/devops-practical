@@ -134,9 +134,9 @@ export $PWD/ansible-playbooks/kubespray/kubeconfig/admin.conf
 kubectl get nodes
 ```
 
-#### helm commands
+#### helm cli commands
 
-The ansible playbook will automatically deploy the helm charts included in this repository, but they can be installed manually with the commands below.
+The ansible playbook will automatically deploy the helm charts included in this repository, but they can be installed manually with the commands below. The charts in the repo were left untarred to make them easier to browse on github.
 
 ##### mongodb
 
@@ -145,11 +145,7 @@ NOTE: mongodb needs to be installed and ready before installing the application.
 install: 
 
 ```
-```
-
-upgrade:
-
-```
+helm install mongodb helm-charts/mongo-chart/ -n mongodb --create-namespace 
 ```
 
 ##### application
@@ -157,11 +153,7 @@ upgrade:
 install: 
 
 ```
-```
-
-upgrade:
-
-```
+helm install swimapp helm-charts/swim-chart/ -f helm-charts/swim-values.yaml -n swimapp --create-namespace
 ```
 
 ##### ingress-nginx & cert-manager
@@ -170,9 +162,29 @@ These charts are from the project's repos.
 
 ###### ingress-nginx
 
+We are deploying ingress-nginx with only one custom value. `contorller.config.hsts=false`.  HSTS needs disabled because we are using self signed ceritifcates. In a production environment HSTS should be enabled. 
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace --set controller.config.hsts=false
+```
 
 ###### cert-manager
 
+We install cert-manager with only one custom value, `installCRDs=true`. 
+
+```
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace --version v1.5.4 --set installCRDs=true
+```
+
+NOTE: after cert manager is installed we need to configure a clusterissuer. The ansible playbooks included in this repo will create the issuer, but to create it manually run:
+
+```
+kubectl apply -f helm-charts/cert-manager-clusterissuer.yaml
+```
 
 #### dockerization
 
