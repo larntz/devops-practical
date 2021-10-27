@@ -45,6 +45,10 @@
         enabled: true
         state: reloaded 
 
+    - name: delete kubespray-global-vars.yaml if exists
+      file:
+        path: ./kubespray-global-vars.yaml
+        state: absent
     - name: add loadbalancer global vars for kubespray
       become: false
       delegate_to: localhost
@@ -54,7 +58,7 @@
         mode: "0644"
         path: ./kubespray-global-vars.yaml
         block: |
-          apiserver_loadbalancer_domain_name: "lb.local"
+          apiserver_loadbalancer_domain_name: "{{ inventory_hostname }}"
           loadbalancer_apiserver:
             address: {{ lb_ip }}
             port: 6443
