@@ -138,12 +138,43 @@ kubectl get nodes
 
 The ansible playbook will automatically deploy the helm charts included in this repository, but they can be installed manually with the commands below.
 
+##### mongodb
+
+NOTE: mongodb needs to be installed and ready before installing the application. If the database isn't ready the application will fail to start properly.
+
 install: 
 
 ```
 ```
 
-#### dockerize
+upgrade:
+
+```
+```
+
+##### application
+
+install: 
+
+```
+```
+
+upgrade:
+
+```
+```
+
+##### ingress-nginx & cert-manager
+
+These charts are from the project's repos.
+
+###### ingress-nginx
+
+
+###### cert-manager
+
+
+#### dockerization
 
 The `docker/` directory contains the dockerfile to build the application. 
 
@@ -161,9 +192,7 @@ docker push larntz/swim/2021102700
 - When packer is creating the vm images it calls an ansible playbook that installs any available updates. 
 
 
-#### ha & scalability summary
-
-##### ha
+#### ha summary
 
 - cluster is deployed with 3 control plane nodes behind an haproxy loadbalancer.
 - The mongodb-community-operator is used to deploy mongodb as a cluster. By default we are deployhing 3 members. This can be scaled up and down.
@@ -171,13 +200,13 @@ docker push larntz/swim/2021102700
 
 HA functionality could be improved using multiple ingress controllers, multiple load balancers with a vip coupled with a service like route53 that can do loadbalancing and health checks. Next steps from there could be a multi-cluster deployment.
 
-#### scalability
+#### scalability summary
 
 - both the database cluster and application can be scaled up as needed. 
 - TODO: cluster scaling with terraform and kubespray
 
 
-#### screenshots
+### screenshots
 
 ![screenshot of new record](images/new-post.png)
 ![screenshot of cluster resources](images/cluster_resources.png)

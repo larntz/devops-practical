@@ -30,7 +30,7 @@ resource "libvirt_network" "k8snet" {
 }
 
 resource "libvirt_volume" "os_image" {
-  name = "debian-bullseye.qcow2"
+  name = "${ random_string.deployment_id.result }-debian-bullseye.qcow2"
   #source = "https://cloud.debian.org/images/cloud/bullseye/20211011-792/debian-11-generic-amd64-20211011-792.qcow2"
   source = "../packer-builds/packer-debian-11.1-amd64-qemu/debian-11.1-amd64"
 }
