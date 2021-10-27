@@ -3,9 +3,9 @@
 ## packer build if necessary
 if [ -d $PWD/packer-builds ]; then 
   echo $'\n\nalready packed, proceeding to terraform\n'
-  packer build packer/debian.json
 else
   echo $'\n\npack it up, pack it in, let us begin'
+  packer build packer/debian.json
 fi
 
 # create vms and ansible host inventory
