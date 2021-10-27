@@ -142,7 +142,7 @@ The ansible playbook will automatically deploy the helm charts included in this 
 
 NOTE: mongodb needs to be installed and ready before installing the application. If the database isn't ready the application will fail to start properly.
 
-install: 
+helm install: 
 
 ```
 helm install mongodb helm-charts/mongo-chart/ -n mongodb --create-namespace 
@@ -150,7 +150,7 @@ helm install mongodb helm-charts/mongo-chart/ -n mongodb --create-namespace
 
 ##### application
 
-install: 
+helm install: 
 
 ```
 helm install swimapp helm-charts/swim-chart/ -f helm-charts/swim-values.yaml -n swimapp --create-namespace
@@ -203,6 +203,8 @@ docker push larntz/swim/2021102700
 - The application is accessible over HTTPS only. Cert-manager automatically provisions self signed certificates, but in a production envirionment we would use an actually trusted isuser such as let's encrypt.
 - When packer is creating the vm images it calls an ansible playbook that installs any available updates. 
 
+Security could be improved by requiring TLS to connect to the mongodb members. But, becuase I am using self signed certificates I would need to create a configMap that includes the CA certificate. Furthermore, there is no integration between the mongodb-community-operator and cert-manager at this time so this coniguration would require some additional glue to automate. 
+
 
 #### ha summary
 
@@ -214,12 +216,37 @@ HA functionality could be improved using multiple ingress controllers, multiple 
 
 #### scalability summary
 
-- both the database cluster and application can be scaled up as needed. 
-- TODO: cluster scaling with terraform and kubespray
+##### application scaling 
+
+The mongodb cluster can be scaled up and down by modifying the `members` field of the `mongo-values.yaml` file and running `helm upgrade` for the chart. 
+
+The application can be scaled up and down by modifying the `replicas` of the `swim-values.yaml` file and running `helm upgrade` for the charge. 
+
+##### cluster scaling
+
+To scale the cluster up, first run terraform with an updated `worker_nodes` var, and then run the `scale.yaml` playbook from kubespray.
+
+Example:
+
+```
+terraform -chdir=terraform apply -auto-approve -var worker_nodes=5
+ansible-playbook -i cluster-hosts ansible-playbooks/kubespray/scale.yml --become
+```
+
+To scale the cluster down, first run the ` ` playbook from kubespray and then run terraform again with a `workder_nodes` variable decreased appropriately. 
+
+Example (removing 1 node):
+
+```
+ansible-playbook -i cluster-hosts ansible-playbooks/kubespray/remove-node.yml --become -e node=kgnmyp-wk-04
+terraform -chdir=terraform apply -auto-approve -var worker_nodes=4
+```
+
+NOTE: Nodes __must__ be removed in reverse order (highest nubmered nodes first). You __must__ run the remove-node.yaml playbook for each node you intend to remove before running the terraform command. 
 
 
 ### screenshots
 
 ![screenshot of new record](images/new-post.png)
-![screenshot of cluster resources](images/cluster_resources.png)
+![screenshot of cluster resources](images/cluster-resources.png)
 

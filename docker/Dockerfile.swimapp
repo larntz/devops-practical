@@ -14,4 +14,5 @@ FROM node:17-slim
 RUN useradd -m app
 USER app
 COPY --from=builder /home/app/swim /home/app/
+WORKDIR /home/app
 ENTRYPOINT ["npm","start"]
