@@ -136,12 +136,45 @@ kubectl get nodes
 
 #### helm commands
 
+The ansible playbook will automatically deploy the helm charts included in this repository, but they can be installed manually with the commands below.
+
+install: 
+
+```
+```
+
 #### dockerize
 
-#### security
+The `docker/` directory contains the dockerfile to build the application. 
+
+The commands used to build and push the image are:
+
+```
+docker build -t larntz/swim:2021102700 -f Dockerfile.swimapp .
+docker push larntz/swim/2021102700
+```
+
+#### security summary
+
+- Mongodb is configured to require a login and only allows access to the specified database.
+- The application is accessible over HTTPS only. Cert-manager automatically provisions self signed certificates, but in a production envirionment we would use an actually trusted isuser such as let's encrypt.
+- When packer is creating the vm images it calls an ansible playbook that installs any available updates. 
 
 
-#### ha / scalability
+#### ha & scalability summary
+
+##### ha
+
+- cluster is deployed with 3 control plane nodes behind an haproxy loadbalancer.
+- The mongodb-community-operator is used to deploy mongodb as a cluster. By default we are deployhing 3 members. This can be scaled up and down.
+- The application is deployed with 3 replicas. This can be scaled up and down.
+
+HA functionality could be improved using multiple ingress controllers, multiple load balancers with a vip coupled with a service like route53 that can do loadbalancing and health checks. Next steps from there could be a multi-cluster deployment.
+
+#### scalability
+
+- both the database cluster and application can be scaled up as needed. 
+- TODO: cluster scaling with terraform and kubespray
 
 
 #### screenshots
