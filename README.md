@@ -54,10 +54,26 @@ This was developed and tested on Debian 10. Other distros may have different req
 
 These commands should be run from a user that can sudo without a password.
 
-1. Install debian packages on host system.
+1. Install initial debian packages on host system.
     ```
     sudo apt install -y git python3 python3-venv build-essential software-properties-common mkisofs \
       apt-transport-https ca-certificates curl
+    ```
+1. Install `packer`, `terraform`, `helm`, and `kubectl`.
+    ```
+    # add hashicorp repositories
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+     
+    # add helm repositories
+    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+
+    # add kubernetes repo
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+    sudo apt update && sudo apt -y install packer terraform helm kubectl
     ```
 1. Clone this code repository.
     ```
@@ -86,23 +102,7 @@ NOTE: the remaining commands in this README should be executed from the repo's t
     ```
 1. Install required ansible-galaxy collections.
     ```
-    ansible-galaxy install -r ansible-playbooks/requirements/requirements.yaml
-    ```
-1. Finally install `packer`, `terraform`, `helm`, and `kubectl`.
-    ```
-    # add hashicorp repositories
-    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-     
-    # add helm repositories
-    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-
-    # add kubernetes repo
-    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-    sudo apt update && sudo apt -y install packer terraform helm kubectl
+    ansible-galaxy install -r ansible-playbooks/requirements/collections.yaml
     ```
 
 ### build steps

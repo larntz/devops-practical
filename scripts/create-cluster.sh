@@ -1,4 +1,6 @@
 #!/bin/bash
+
+## packer build if necessary
 if [ -d $PWD/packer-builds ]; then 
   echo $'\n\nalready packed, proceeding to terraform\n'
   packer build packer/debian.json
