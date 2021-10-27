@@ -1,5 +1,3 @@
-![screenshot of new record](screenshots/new-post.png)
-
 # Contents
 
   - [Objective](#objective)
@@ -266,5 +264,6 @@ There are a few help scripts used during development. They are only intended for
 ### screenshots
 
 ![screenshot of new record](screenshots/new-post.png)
+![screenshot of certificate info](screenshots/cert-info.png)
 ![screenshot of cluster resources](screenshots/cluster.png)
 
