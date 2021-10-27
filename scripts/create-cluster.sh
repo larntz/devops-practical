@@ -12,7 +12,8 @@ fi
 terraform -chdir=./terraform/ init
 terraform -chdir=./terraform/ apply -auto-approve
 
-# run asible playbook to configure cluster lb and kubespray global vars
+# run ansible playbook to configure cluster lb, set kubespray global vars, 
+#   run kubespray cluster.yaml playbook, and do post kubespray cluster configuration.
 ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
 
 echo "finished."
