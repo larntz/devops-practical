@@ -205,7 +205,6 @@ docker push larntz/swim/2021102700
 
 Security could be improved by requiring TLS to connect to the mongodb members. But, becuase I am using self signed certificates I would need to create a configMap that includes the CA certificate. Furthermore, there is no integration between the mongodb-community-operator and cert-manager at this time so this coniguration would require some additional glue to automate. 
 
-
 #### ha summary
 
 - cluster is deployed with 3 control plane nodes behind an haproxy loadbalancer.
@@ -233,7 +232,7 @@ terraform -chdir=terraform apply -auto-approve -var worker_nodes=5
 ansible-playbook -i cluster-hosts ansible-playbooks/kubespray/scale.yml --become
 ```
 
-To scale the cluster down, first run the ` ` playbook from kubespray and then run terraform again with a `workder_nodes` variable decreased appropriately. 
+To scale the cluster down, first run the `remove-node.yaml` playbook from kubespray and then run terraform again with a `workder_nodes` variable decreased appropriately. 
 
 Example (removing 1 node):
 
@@ -244,6 +243,13 @@ terraform -chdir=terraform apply -auto-approve -var worker_nodes=4
 
 NOTE: Nodes __must__ be removed in reverse order (highest nubmered nodes first). You __must__ run the remove-node.yaml playbook for each node you intend to remove before running the terraform command. 
 
+### helper scripts
+
+There are a few help scripts used during development. They are only intended for testing purposes, and not production quality.
+
+- `bootstrap-project.sh`: this script can be run after step 3 of the [prebuild steps](#prebuild-steps). It will clone the kubespray repo, install a python venv and all python requirements, and install terraform, packer, helm, and kubectl on the host system. 
+- `create-cluster.sh`: this script will run the remainig build steps. At completion the cluster will be provisioned and the application will be installed and running. NOTE: customize terraform variables and helm values before running this step. 
+- `destroy-cluster.sh`: this script will tear down the cluster vms, support libvirt resources, and delete configuration files created during deployment. 
 
 ### screenshots
 
