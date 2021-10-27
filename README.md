@@ -134,6 +134,18 @@ export $PWD/ansible-playbooks/kubespray/kubeconfig/admin.conf
 kubectl get nodes
 ```
 
+Output:
+```
+NAME           STATUS                        ROLES                  AGE   VERSION
+kgnmyp-cp-00   Ready                         control-plane,master   75m   v1.22.2
+kgnmyp-cp-01   Ready                         control-plane,master   74m   v1.22.2
+kgnmyp-cp-02   Ready                         control-plane,master   74m   v1.22.2
+kgnmyp-wk-00   Ready                         <none>                 73m   v1.22.2
+kgnmyp-wk-01   Ready                         <none>                 73m   v1.22.2
+kgnmyp-wk-02   Ready                         <none>                 39m   v1.22.2
+kgnmyp-wk-03   Ready                         <none>                 39m   v1.22.2
+```
+
 #### helm cli commands
 
 The ansible playbook will automatically deploy the helm charts included in this repository, but they can be installed manually with the commands below. The charts in the repo were left untarred to make them easier to browse on github.
