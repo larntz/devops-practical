@@ -1,4 +1,4 @@
-![screenshot of new record](images/new-article.png)
+![screenshot of new record](./images/new-article.png)
 
 # Contents
 
