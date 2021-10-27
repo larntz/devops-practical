@@ -19,7 +19,7 @@ ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
 echo "finished."
 
 if [ $? == 0 ]; then 
-  echo "export KUBECONFIG=$PWD/artifacts/admin.conf to access cluster."
+  echo "export KUBECONFIG=$PWD/ansible-playbooks/kubespray/kubeconfig/admin.conf to access cluster."
 else 
   echo "something went wrong."
 fi
