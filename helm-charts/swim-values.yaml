@@ -1,6 +1,9 @@
 app:
   replicas: 3
   hostname: swim.larntz
+  image:
+    repository: larntz/swim
+    tag: "2021102700"
 mongodb:
   # information required to construct the MONGODB_URL
   database: swimdb
