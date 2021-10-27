@@ -265,6 +265,6 @@ There are a few help scripts used during development. They are only intended for
 
 ### screenshots
 
-![screenshot of new record](images/new-post.png)
-![screenshot of cluster resources](images/cluster.png)
+![screenshot of new record](screenshots/new-post.png)
+![screenshot of cluster resources](screenshots/cluster.png)
 
