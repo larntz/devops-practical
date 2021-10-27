@@ -66,7 +66,7 @@ These commands should be run from a user that can sudo without a password.
     cd devops-practical
     ```
 
-NOTE: the remaining commands in this README should be exected from the repo's top level directory.
+NOTE: the remaining commands in this README should be executed from the repo's top level directory.
 
 4. Clone the kubespray repository into the `ansible-playbooks` directory.
     ```
@@ -121,7 +121,7 @@ Once the prerequisites are met the entire system can be built using the commands
     ansible-playbook -i cluster-hosts ansible-playbooks/configure-cluster.yaml
     ```
 
-### access cluster and validation
+### cluster access and validation
 
 After the cluster has been deployed and configured the admin kubeconfig file will be located in `ansible-playbooks/kubespray/kubeconfig/admin.conf`. 
 

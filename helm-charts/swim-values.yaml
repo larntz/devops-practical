@@ -1,6 +1,6 @@
 app:
   replicas: 3
-  hostname: swim.app
+  hostname: swim.larntz
 mongodb:
   # information required to construct the MONGODB_URL
   database: swimdb

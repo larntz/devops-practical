@@ -3,9 +3,23 @@
   hosts: localhost
   become: true
   tasks:
+    - name: set kubeconfig dir permissions
+      ansible.builtin.file:
+        state: directory
+        path: "{{ playbook_dir }}/kubespray/kubeconfig"
+        mode: '0755'
+    - name: set kubeconfig file permissions
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/kubespray/kubeconfig/admin.conf"
+        mode: '0644'
+      register: admin_conf
+    - name: debug
+      debug:
+        var: playbook_dir
+
     - name: set kubeconfig fact
       set_fact:
-        kubeconfig: "kubespray/kubeconfig/admin.conf"
+        kubeconfig: "{{ playbook_dir }}/kubespray/kubeconfig/admin.conf"
 
     # cert-manager
     - name: add jetstack cert-manager repo
@@ -13,6 +27,7 @@
         name: jetstack
         repo_url: https://charts.jetstack.io
     - name: helm install cert-manager
+      become: true
       community.kubernetes.helm:
         kubeconfig: "{{ kubeconfig }}"
         name: cert-manager
@@ -24,6 +39,7 @@
           installCRDs: true
     - name: configure self-signed cluster issuer
       community.kubernetes.k8s:
+        kubeconfig: "{{ kubeconfig }}"
         state: present
         definition:
           apiVersion: cert-manager.io/v1
@@ -46,6 +62,10 @@
         create_namespace: true
         chart_ref: ingress-nginx/ingress-nginx
         chart_version: 4.0.6
+        values:
+          controller:
+            config:
+              hsts: false
 
     # mongo-chart
     - name: helm install mongo-chart

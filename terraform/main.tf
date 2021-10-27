@@ -36,19 +36,19 @@ resource "libvirt_volume" "os_image" {
 }
 
 resource "libvirt_volume" "lb-volume" {
-  name  = "lb-${ random_string.deployment_id.result }}-vol-00.qcow2"
+  name  = "lb-${ random_string.deployment_id.result }-vol-00.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "cp-volume" {
   count = 3
-  name  = "cp-${ random_string.deployment_id.result }}-vol-0${count.index}.qcow2"
+  name  = "cp-${ random_string.deployment_id.result }-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "wk-volume" {
   count = var.worker_nodes
-  name  = "wk-${ random_string.deployment_id.result }}-vol-0${count.index}.qcow2"
+  name  = "wk-${ random_string.deployment_id.result }-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
@@ -64,7 +64,7 @@ data "template_file" "user_data" {
 resource "libvirt_domain" "lb-domain" {
   vcpu = 2
   memory = "4096"
-  name = "lb-${ random_string.deployment_id.result }}-00"
+  name = "lb-${ random_string.deployment_id.result }-00"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -85,7 +85,7 @@ resource "libvirt_domain" "cp-domain" {
   count = 3
   vcpu = 4
   memory = "8192"
-  name = "cp-${ random_string.deployment_id.result }}-0${count.index}"
+  name = "cp-${ random_string.deployment_id.result }-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -106,7 +106,7 @@ resource "libvirt_domain" "wk-domain" {
   count = var.worker_nodes
   vcpu = 4 
   memory = "16384"
-  name = "wk-${ random_string.deployment_id.result }}-0${count.index}"
+  name = "wk-${ random_string.deployment_id.result }-0${count.index}"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -130,6 +130,7 @@ resource "local_file" "ansible_inventory" {
       ansible_control_ips   = libvirt_domain.cp-domain.*.network_interface.0.addresses.0,
       ansible_group_workload = libvirt_domain.wk-domain.*.name,
       ansible_workload_ips = libvirt_domain.wk-domain.*.network_interface.0.addresses.0,
+      ansible_lb_name = libvirt_domain.lb-domain.name,
       ansible_lb_ip = libvirt_domain.lb-domain.network_interface.0.addresses.0,
     }
   )

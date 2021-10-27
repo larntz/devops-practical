@@ -26,3 +26,5 @@
   tags:
     - post_kubespray_config
   import_playbook: ./post-kubespray-configuration.yaml
+  vars:
+    ansible_become: true

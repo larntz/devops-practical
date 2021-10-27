@@ -1,9 +1,9 @@
-# BEGIN lb config 192.168.200.16
+# BEGIN lb config 192.168.200.208
 apiserver_loadbalancer_domain_name: "lb.local"
 loadbalancer_apiserver:
-  address: 192.168.200.16
+  address: 192.168.200.208
   port: 6443
-# END lb config 192.168.200.16
+# END lb config 192.168.200.208
 # BEGIN metallb and ingress config
 # enable local_path storage
 local_path_provisioner_enabled: true
@@ -17,3 +17,9 @@ metallb_ip_range:
 kubeconfig_localhost: true
 artifacts_dir: ./kubeconfig
 # END metallb and ingress config
+# BEGIN lb config 192.168.200.167
+apiserver_loadbalancer_domain_name: "lb.local"
+loadbalancer_apiserver:
+  address: 192.168.200.167
+  port: 6443
+# END lb config 192.168.200.167
