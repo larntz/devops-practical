@@ -56,7 +56,7 @@ These commands should be run from a user that can sudo without a password.
 
 1. Install debian packages on host system.
     ```
-    sudo apt install -y python3 python3-venv build-essential software-properties-common mkisofs \
+    sudo apt install -y git python3 python3-venv build-essential software-properties-common mkisofs \
       apt-transport-https ca-certificates curl
     ```
 1. Clone this code repository.
@@ -133,6 +133,15 @@ Access the cluster via `kubectl` after setting the `KUBECONFIG` environment vari
 export $PWD/ansible-playbooks/kubespray/kubeconfig/admin.conf
 kubectl get nodes
 ```
+
+#### helm commands
+
+#### dockerize
+
+#### security
+
+
+#### ha / scalability
 
 
 #### screenshots
