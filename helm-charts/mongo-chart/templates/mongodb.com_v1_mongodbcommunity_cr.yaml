@@ -1,0 +1,40 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: {{ include "mongo-chart.fullname" . }}
+spec:
+  members: {{ .Values.mongodb.members }}
+  type: ReplicaSet
+  version: "4.4.10"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: {{ .Values.mongodb.username }}
+      db: admin
+      passwordSecretRef: # a reference to the secret that will be used to generate the user's password
+        name: mongodb-user-password
+      roles:
+        - name: dbAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+        - name: dbAdmin
+          db: {{ .Values.mongodb.database }}
+        - name: readWrite
+          db: {{ .Values.mongodb.database }}
+      scramCredentialsSecretName: my-scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+
+# the user credentials will be generated from this secret
+# once the credentials are generated, this secret is no longer required
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-user-password
+type: Opaque
+stringData:
+  password: {{ .Values.mongodb.password }}

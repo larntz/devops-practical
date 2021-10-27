@@ -1,5 +1,6 @@
 artifacts/
 venv/
+ansible-playbooks/kubespray-global-vars.yaml
 ansible-playbooks/kubespray/
 packer-builds/
 devops-practical/repo/
