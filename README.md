@@ -1,4 +1,4 @@
-![screenshot of new record](./images/new-article.png)
+![screenshot of new record](./images/new-post.png)
 
 # Contents
 
@@ -137,6 +137,6 @@ kubectl get nodes
 
 #### screenshots
 
-![screenshot of new record](images/new-article.png)
+![screenshot of new record](images/new-post.png)
 ![screenshot of cluster resources](images/cluster_resources.png)
 
