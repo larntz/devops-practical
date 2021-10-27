@@ -10,23 +10,23 @@ provider "libvirt" {
   uri = var.libvirt_url
 }
 
-resource "libvirt_network" "k8snet" {
-  name = "k8snet"
-  mode = "route"
-  domain = "k8s.local"
-  addresses = ["192.168.200.0/24"]
-  dns { 
-    enabled = true
-    local_only = false
-  }
-}
-
 resource "random_string" "deployment_id" {
   length = 6
   special = false
   lower = true
   upper = false
   number = false
+}
+
+resource "libvirt_network" "k8snet" {
+  name = "${ random_string.deployment_id.result }-k8s-net"
+  mode = "route"
+  domain = "k8s.local"
+  addresses = [var.node_ipv4_subnet]
+  dns { 
+    enabled = true
+    local_only = false
+  }
 }
 
 resource "libvirt_volume" "os_image" {
@@ -36,24 +36,24 @@ resource "libvirt_volume" "os_image" {
 }
 
 resource "libvirt_volume" "lb-volume" {
-  name  = "lb-${ random_string.deployment_id.result }-vol-00.qcow2"
+  name  = "${ random_string.deployment_id.result }-lb-vol-00.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "cp-volume" {
   count = 3
-  name  = "cp-${ random_string.deployment_id.result }-vol-0${count.index}.qcow2"
+  name  = "${ random_string.deployment_id.result }-cp-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_volume" "wk-volume" {
   count = var.worker_nodes
-  name  = "wk-${ random_string.deployment_id.result }-vol-0${count.index}.qcow2"
+  name  = "${ random_string.deployment_id.result }-wk-vol-0${count.index}.qcow2"
   base_volume_id = libvirt_volume.os_image.id
 }
 
 resource "libvirt_cloudinit_disk" "commoninit" {
-  name      = "commoninit.iso"
+  name      = "${ random_string.deployment_id.result }-commoninit.iso"
   user_data = data.template_file.user_data.rendered
 }
 
@@ -64,7 +64,7 @@ data "template_file" "user_data" {
 resource "libvirt_domain" "lb-domain" {
   vcpu = 2
   memory = "4096"
-  name = "lb-${ random_string.deployment_id.result }-00"
+  name = "${ random_string.deployment_id.result }-lb-00"
   qemu_agent = true
   cloudinit = libvirt_cloudinit_disk.commoninit.id
   graphics {
@@ -76,7 +76,7 @@ resource "libvirt_domain" "lb-domain" {
     volume_id = libvirt_volume.lb-volume.id
   }
   network_interface {
-    network_name = "k8snet"
+    network_name = libvirt_network.k8snet.name
     wait_for_lease = true
   }
 }
@@ -97,7 +97,7 @@ resource "libvirt_domain" "cp-domain" {
     volume_id = element(libvirt_volume.cp-volume.*.id, count.index)
   }
   network_interface {
-    network_name = "k8snet"
+    network_name = libvirt_network.k8snet.name
     wait_for_lease = true
   }
 }
@@ -118,7 +118,7 @@ resource "libvirt_domain" "wk-domain" {
     volume_id = element(libvirt_volume.wk-volume.*.id, count.index)
   }
   network_interface {
-    network_name = "k8snet"
+    network_name = libvirt_network.k8snet.name
     wait_for_lease = true
   }
 }
