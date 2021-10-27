@@ -46,19 +46,35 @@
         state: reloaded 
 
     - name: delete kubespray-global-vars.yaml if exists
+      delegate_to: localhost
       file:
-        path: ./kubespray-global-vars.yaml
+        path: "{{ playbook_dir }}/kubespray-global-vars.yaml"
         state: absent
+
     - name: add loadbalancer global vars for kubespray
       become: false
       delegate_to: localhost
       blockinfile:
-        marker: "# {mark} lb config {{ lb_ip }}" 
+        marker: "# {mark} lb config" 
         create: true
         mode: "0644"
-        path: ./kubespray-global-vars.yaml
+        path: "{{ playbook_dir }}/kubespray-global-vars.yaml"
         block: |
           apiserver_loadbalancer_domain_name: "{{ inventory_hostname }}"
           loadbalancer_apiserver:
             address: {{ lb_ip }}
             port: 6443
+
+    - name: add metallb global vars for kubespray
+      become: false
+      delegate_to: localhost
+      blockinfile:
+        marker: "# {mark} metallb config" 
+        mode: "0644"
+        path: "{{ playbook_dir }}/kubespray-global-vars.yaml"
+        block: |
+          kube_proxy_strict_arp: true
+          metallb_enabled: true
+          metallb_speaker_enabled: true
+          metallb_ip_range:
+            - {{ metallb_start_address }} - {{ metallb_end_address }}

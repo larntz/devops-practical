@@ -12,8 +12,13 @@ ansible_user=debian
 ansible_ssh_common_args="-o UserKnownHostsFile=.known_hosts -o StrictHostKeyChecking=accept-new"
 
 
+
 [lb]
 ${ ansible_lb_name }
+
+[lb:vars]
+metallb_start_address=${ ansible_metallb_start_address }
+metallb_end_address=${ ansible_metallb_end_address }
 
 [kube_control_plane]
 %{ for index, group in ansible_group_control ~}

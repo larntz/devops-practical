@@ -23,6 +23,7 @@ resource "libvirt_network" "k8snet" {
   mode = "route"
   domain = "k8s.local"
   addresses = [var.node_ipv4_subnet]
+  dhcp { enabled = false }
   dns { 
     enabled = true
     local_only = false
@@ -76,7 +77,8 @@ resource "libvirt_domain" "lb-domain" {
     volume_id = libvirt_volume.lb-volume.id
   }
   network_interface {
-    network_name = libvirt_network.k8snet.name
+    network_name   = libvirt_network.k8snet.name
+    addresses      = [cidrhost(var.node_ipv4_subnet, 10)]
     wait_for_lease = true
   }
 }
@@ -97,7 +99,8 @@ resource "libvirt_domain" "cp-domain" {
     volume_id = element(libvirt_volume.cp-volume.*.id, count.index)
   }
   network_interface {
-    network_name = libvirt_network.k8snet.name
+    network_name   = libvirt_network.k8snet.name
+    addresses      = [cidrhost(var.node_ipv4_subnet, 50 + count.index)]
     wait_for_lease = true
   }
 }
@@ -119,6 +122,7 @@ resource "libvirt_domain" "wk-domain" {
   }
   network_interface {
     network_name = libvirt_network.k8snet.name
+    addresses      = [cidrhost(var.node_ipv4_subnet, 100 + count.index)]
     wait_for_lease = true
   }
 }
@@ -132,6 +136,8 @@ resource "local_file" "ansible_inventory" {
       ansible_workload_ips = libvirt_domain.wk-domain.*.network_interface.0.addresses.0,
       ansible_lb_name = libvirt_domain.lb-domain.name,
       ansible_lb_ip = libvirt_domain.lb-domain.network_interface.0.addresses.0,
+      ansible_metallb_start_address = cidrhost(var.node_ipv4_subnet, 240),
+      ansible_metallb_end_address = cidrhost(var.node_ipv4_subnet, 254)
     }
   )
   filename = "../cluster-hosts"

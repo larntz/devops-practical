@@ -7,18 +7,19 @@
       become: false
       delegate_to: localhost
       blockinfile:
-        marker: "# {mark} metallb and ingress config" 
+        marker: "# {mark} local_path_provisioner config" 
         mode: "0644"
         path: kubespray-global-vars.yaml
         block: |
-          # enable local_path storage
           local_path_provisioner_enabled: true
-          # enable metallb
-          kube_proxy_strict_arp: true
-          metallb_enabled: true
-          metallb_speaker_enabled: true
-          metallb_ip_range:
-            - 192.168.200.250-192.168.200.254
-          # export kubeconfig after cluster creation
+
+    - name: add metallb global vars for kubespray
+      become: false
+      delegate_to: localhost
+      blockinfile:
+        marker: "# {mark} kubeconfig_localhost & artifacts_dir config" 
+        mode: "0644"
+        path: kubespray-global-vars.yaml
+        block: |
           kubeconfig_localhost: true
           artifacts_dir: ./kubeconfig
