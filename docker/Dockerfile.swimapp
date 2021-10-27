@@ -1,5 +1,5 @@
 # vim:filetype=dockerfile
-FROM node:17
+FROM node:17 as builder
 
 RUN useradd -m app
 WORKDIR /home/app/swim
@@ -9,4 +9,9 @@ RUN git clone https://github.com/swimlane/devops-practical.git ./ && \
   git checkout 7f80c29b02eb9f6a168189f20bb66ad385c148dd  && \
   npm install
 
+
+FROM node:17-slim
+RUN useradd -m app
+USER app
+COPY --from=builder /home/app/swim /home/app/
 ENTRYPOINT ["npm","start"]
