@@ -6,6 +6,8 @@ packer-builds/
 devops-practical/repo/
 .terraform/
 
+teraform/.terraform.lock.hcl
+
 *.tfstate*
 cluster-hosts
 .known_hosts
