@@ -18,7 +18,7 @@
           metallb_enabled: true
           metallb_speaker_enabled: true
           metallb_ip_range:
-            - 192.168.200.253-192.168.200.254
+            - 192.168.200.250-192.168.200.254
           # export kubeconfig after cluster creation
           kubeconfig_localhost: true
-          artifacts_dir: "{{ playbook_dir }}/kubeconfig"
+          artifacts_dir: ./kubeconfig
